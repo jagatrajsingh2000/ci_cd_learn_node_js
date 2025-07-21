@@ -1,0 +1,40 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+
+# PM2 logs and dumps
+pids/
+*.pid
+*.seed
+*.pid.lock
+dump.pm2
+*.log
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# Nginx (if you accidentally copy configs)
+nginx.conf
+
+# Build artifacts
+dist/
+build/
+
+# Optional cache folders
+.cache/
+.nyc_output/
+coverage/
+tmp/
+
+# VSCode a

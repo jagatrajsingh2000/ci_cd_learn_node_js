@@ -1,0 +1,32 @@
+name: Deploy to EC2 (Dev & Prod)
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to the correct EC2 instance
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST_DEV }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY_DEV }}
+          script: |
+            echo "Defaulting to DEV"
+        if: github.ref == 'refs/heads/dev'
+
+      - name: Deploy to Production EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST_PROD }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY_PROD }}
+          script: |
+            echo "Deploying to PROD"
+        if: github.ref == 'refs/heads/main'

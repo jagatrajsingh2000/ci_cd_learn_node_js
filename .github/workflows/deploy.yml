@@ -11,22 +11,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to the correct EC2 instance
+      - name: Deploy to DEV EC2
+        if: github.ref == 'refs/heads/dev'
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST_DEV }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY_DEV }}
           script: |
-            echo "Defaulting to DEV"
-        if: github.ref == 'refs/heads/dev'
+            # Ensure directory exists
+            mkdir -p ~/ci_cd_node_demo
+            cd ~/ci_cd_node_demo
 
-      - name: Deploy to Production EC2
+            # Clone if missing, else pull latest
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }} ./
+            else
+              git pull origin dev
+            fi
+
+            # Install dependencies and restart
+            npm install
+            pm2 restart demo-app || pm2 start app.js --name demo-app
+
+      - name: Deploy to PROD EC2
+        if: github.ref == 'refs/heads/main'
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST_PROD }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY_PROD }}
           script: |
-            echo "Deploying to PROD"
-        if: github.ref == 'refs/heads/main'
+            mkdir -p ~/ci_cd_node_demo
+            cd ~/ci_cd_node_demo
+
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }} ./
+            else
+              git pull origin main
+            fi
+
+            npm install
+            pm2 restart demo-app || pm2 start app.js --name demo-app
